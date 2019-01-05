@@ -274,7 +274,7 @@ else:
     imags = imags1 + imags2 + imags3
     labels = labels1 + labels2 + labels3
     new_imags = process_imgs(imags, 3, np.array([128, 128, 64]), np.array([1, 1, 1.5]), sitk.sitkLinear)
-    new_labels = process_imgs(labels, 3, np.array([128, 128, 64]), np.array([1, 1, 1.5]), sitk.sitkLinear, original=False)
+    new_labels = process_imgs(labels, 3, np.array([128, 128, 64]), np.array([1, 1, 1.5]), sitk.sitkLinear, original=False).astype("int")
     '''new_imags = new_imags.reshape(new_imags.shape + (1,)).astype(np.float32)
     new_labels = new_labels.reshape(new_labels.shape + (1,))
     new_labels = np.concatenate([new_labels, ~new_labels], axis=4)
@@ -467,7 +467,7 @@ class DataAug(Sequence):
         self.xmod = []
         self.ymod = []
         print("HERE1")
-        for i in len(self.x):
+        for i in range(len(self.x)):
             if np.random.uniform() > 0.5:
                 img, label = self.produceRandomlyTranslatedImage(self.x[i], self.y[i])
             elif np.random.uniform() > 0.5:
