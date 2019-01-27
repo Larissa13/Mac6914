@@ -31,11 +31,11 @@ def downconv(layer, n):
     inlayer = layer
     print(np.shape(inlayer))
     for i in range(3):
-        conv = Conv3D(n, (5, 5, 5), padding='same', kernel_initializer='he_normal')(inlayer)
+        conv = Conv3D(n, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(inlayer)
         inlayer = PReLU()(conv)
         print(np.shape(inlayer))
     summed = add([inlayer, layer])
-    stride = Conv3D(2*n, (2, 2, 2), strides=(2, 2, 2), kernel_initializer='he_normal')(summed)
+    stride = Conv3D(2*n, (2, 2, 2), strides=(2, 2, 2), kernel_initializer='glorot_normal')(summed)
     activ = PReLU()(stride) 
     return summed, activ
 
@@ -44,11 +44,11 @@ def upconv(layer, n):
     inlayer = layer
     print(np.shape(inlayer))
     for i in range(3):
-        conv = Conv3D(n*2, (5, 5, 5), padding='same', kernel_initializer='he_normal')(inlayer)
+        conv = Conv3D(n*2, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(inlayer)
         inlayer = PReLU()(conv)
         print(np.shape(inlayer))
     summed = add([inlayer, layer]) 
-    stride = Conv3DTranspose(n//2, (2, 2, 2), strides=(2, 2, 2),kernel_initializer='he_normal')(summed)
+    stride = Conv3DTranspose(n//2, (2, 2, 2), strides=(2, 2, 2),kernel_initializer='glorot_normal')(summed)
     activ = PReLU()(stride)
     return activ
 # Network architecture
@@ -58,24 +58,24 @@ input_layer = Input(shape=(128, 128, 64, 1), name="data")
 #According to table 1 from v-net paper
 #encoding part
 #left layer-1
-conv1 = Conv3D(16, (5, 5, 5), padding='same', kernel_initializer='he_normal')(input_layer)
+conv1 = Conv3D(16, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(input_layer)
 activ_1 = PReLU()(conv1)
 concatinput_1 = concatenate([input_layer]*16)
 summed_1 = add([activ_1, concatinput_1])
-stride_1 = Conv3D(32, (2, 2, 2), strides=(2, 2, 2), kernel_initializer='he_normal')(summed_1)
+stride_1 = Conv3D(32, (2, 2, 2), strides=(2, 2, 2), kernel_initializer='glorot_normal')(summed_1)
 #it is recommended to do advanced activations using other layers
 activ_11 = PReLU()(stride_1) 
 
 #left_layer-2 32 channels
-conv2 = Conv3D(32, (5, 5, 5), padding='same', kernel_initializer='he_normal')(activ_11)
+conv2 = Conv3D(32, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(activ_11)
 activ_2 = PReLU()(conv2)
-conv22 = Conv3D(32, (5, 5, 5), padding='same', kernel_initializer='he_normal')(activ_2)
+conv22 = Conv3D(32, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(activ_2)
 activ_22 = PReLU()(conv22)
 
 
 summed_2 = add([activ_22, activ_11])
 
-stride_2 = Conv3D(64, (2, 2, 2), strides=(2, 2, 2), kernel_initializer='he_normal')(summed_2)
+stride_2 = Conv3D(64, (2, 2, 2), strides=(2, 2, 2), kernel_initializer='glorot_normal')(summed_2)
 activ_23 = PReLU()(stride_2)
 
 print("layer 2 - soma ", np.shape(summed_2))
@@ -120,16 +120,16 @@ print("layer 4 - soma ", np.shape(summed_4))
 print("layer 4 - activ ", np.shape(activ_44))
 
 #left_layer-5 256 channels
-conv5 = Conv3D(256, (5, 5, 5), padding='same', kernel_initializer='he_normal')(activ_44)
+conv5 = Conv3D(256, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(activ_44)
 activ_5 = PReLU()(conv5)
-conv52 = Conv3D(256, (5, 5, 5), padding='same', kernel_initializer='he_normal')(activ_5)
+conv52 = Conv3D(256, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(activ_5)
 activ_52 = PReLU()(conv52)
-conv53 = Conv3D(256, (5, 5, 5), padding='same', kernel_initializer='he_normal')(activ_52)
+conv53 = Conv3D(256, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(activ_52)
 activ_53  = PReLU()(conv53)
 
 summed_5 = add([activ_53, activ_44])
 
-stride_5 = Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2),kernel_initializer='he_normal')(summed_5)
+stride_5 = Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2),kernel_initializer='glorot_normal')(summed_5)
 activ_54 = PReLU()(stride_5)
 
 
@@ -172,24 +172,24 @@ activ_74 = upconv(concat7, 64)
 
 #right_layer-2 (8) 64 channels
 concat8 = concatenate([summed_2, activ_74])
-conv8 = Conv3D(64, (5, 5, 5), padding='same', kernel_initializer='he_normal')(concat8)
+conv8 = Conv3D(64, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(concat8)
 activ_8 = PReLU()(conv8)
-conv82 = Conv3D(64, (5, 5, 5), padding='same',kernel_initializer='he_normal')(activ_8)
+conv82 = Conv3D(64, (5, 5, 5), padding='same',kernel_initializer='glorot_normal')(activ_8)
 activ_82 = PReLU()(conv82)
 
 summed_8 = add([activ_82, concat8]) 
 
-stride_8 = Conv3DTranspose(16, (2, 2, 2), strides=(2, 2, 2), padding='valid',kernel_initializer='he_normal')(summed_8)
+stride_8 = Conv3DTranspose(16, (2, 2, 2), strides=(2, 2, 2), padding='valid',kernel_initializer='glorot_normal')(summed_8)
 activ_83 = PReLU()(stride_8)
 
 #right_layer-1 (9) 32 channels
 concat9 = concatenate([summed_1, activ_83])
-conv9 = Conv3D(32, (5, 5, 5), padding='same', kernel_initializer='he_normal')(concat9)
+conv9 = Conv3D(32, (5, 5, 5), padding='same', kernel_initializer='glorot_normal')(concat9)
 activ_9 = PReLU()(conv9)
 
 summed_9 = add([activ_9, concat9]) 
 
-stride_9 = Conv3D(2, (1, 1, 1), padding='same', kernel_initializer='he_normal')(summed_9)
+stride_9 = Conv3D(2, (1, 1, 1), padding='same', kernel_initializer='glorot_normal')(summed_9)
 activ_92 = PReLU()(stride_9)
 
 
@@ -233,7 +233,7 @@ def dice_coef(y_true, y_pred, smooth=0.00001):
     y_truef = K.flatten(y_true)
     y_predf = K.flatten(y_pred)
     intersection = K.sum((y_truef * y_predf))
-    union = (K.sum(K.abs(y_truef)) + K.sum(K.abs(y_predf)) + smooth)
+    union = (K.sum(y_truef) + K.sum(y_predf) + smooth)
     #print(tf.Session().run(intersection))
     #print(tf.Session().run(union))
     return (2. * intersection + smooth) / union
@@ -295,6 +295,38 @@ def dice_coe(output, target, loss_type='jaccard', axis=(1, 2, 3), smooth=1e-5):
 
 def dice_coef_loss2(y_true, y_pred):
     return 1 - dice_coe(y_true, y_pred)
+
+
+
+def soft_dice_loss(y_true, y_pred, epsilon=1e-6): 
+    ''' 
+    Soft dice loss calculation for arbitrary batch size, number of classes, and number of spatial dimensions.
+    Assumes the `channels_last` format.
+  
+    # Arguments
+        y_true: b x X x Y( x Z...) x c One hot encoding of ground truth
+        y_pred: b x X x Y( x Z...) x c Network output, must sum to 1 over c channel (such as after softmax) 
+        epsilon: Used for numerical stability to avoid divide by zero errors
+    
+    # References
+        V-Net: Fully Convolutional Neural Networks for Volumetric Medical Image Segmentation 
+        https://arxiv.org/abs/1606.04797
+        More details on Dice loss formulation 
+        https://mediatum.ub.tum.de/doc/1395260/1395260.pdf (page 72)
+        
+        Adapted from https://github.com/Lasagne/Recipes/issues/99#issuecomment-347775022
+    '''
+    
+    # skip the batch and class axis for calculating Dice score
+    axes = tuple(range(1, len(y_pred.shape)-1)) 
+    numerator = 2. * K.sum(y_pred * y_true, axes)
+    denominator = K.sum(K.square(y_pred) + K.square(y_true), axes)
+    
+    return 1 - K.mean(numerator / (denominator + epsilon)) # average over classes and batch
+ 
+def dice_coef_loss3(y_true, y_pred):
+  return soft_dice_loss(y_true, y_pred)
+# Loading Data
 
 # Loading Data
 
@@ -405,6 +437,9 @@ if os.path.isfile(filename_imgs) and os.path.isfile(filename_labels):
     test = new_imags[test_n]
     train_label = new_labels[train_n]
     test_label = new_labels[test_n]
+    print("SHAPES ", np.shape(train), test.shape, train_label.shape, test_label.shape)
+    print(test_n, train_n)
+
     print(test_n)
 
 else:
@@ -433,6 +468,7 @@ else:
         pickle.dump(new_imags, img_file)
     with open(filename_labels, "wb") as label_file:
         pickle.dump(new_labels, label_file)
+
 
 # In[10]:
 
@@ -541,7 +577,7 @@ class DataAug(Sequence):
         batch_y = np.array(self.ymod[idx * self.batch_size:(idx + 1) * self.batch_size]).astype("int")
         batch_x = batch_x.reshape(batch_x.shape + (1,)).astype(np.float32)
         batch_y = batch_y.reshape(batch_y.shape + (1,))
-        batch_y = np.concatenate([batch_y, ~batch_y], axis=4)
+        batch_y = np.concatenate([batch_y, 1-batch_y], axis=4)
         batch_y = batch_y.astype(np.float32)
 
         return batch_x, batch_y
@@ -651,8 +687,8 @@ class DataAug(Sequence):
 
     def on_epoch_end(self):
         #modify train_data here
-        self.xmod = self.x
-        self.ymod = self.y
+        self.xmod = []
+        self.ymod = []
         for i in range(len(self.x)):
             prob = np.random.uniform()
             if prob < 0.25:
@@ -677,11 +713,11 @@ train_gen = DataAug(train, train_label,batch_size=2) # you can choose your batch
 # Learning rate update. every 25k iteration decrease by a factor of 10. initial: 10e-4
 
 def step_decay(epoch):
-    initial_lrate = 10e-4
+    initial_lrate = 0.0001
     drop = 0.1
-    epochs_drop = 25000
+    epochs_drop = 80
     rate = initial_lrate
-    if epoch == 25000:
+    if epoch == 80:
         lrate = initial_lrate * math.pow(drop,  
         np.floor((1+epoch)/epochs_drop))
         rate = lrate
@@ -691,16 +727,27 @@ lrate = LearningRateScheduler(step_decay)
 
 callback_list = [lrate]
 
-model.compile(optimizer=SGD(lr=10e-4, momentum=0.99), loss=dice_coef_loss, metrics=[dice_coe])
+model.compile(optimizer=SGD(lr=0.0001, momentum=0.99), loss=dice_coef_loss3, metrics=[dice_coef])
 #model.compile(optimizer=Adam(lr=1e-5), loss=dice_coef_loss2, metrics=[dice_coe])
-#history = model.fit_generator(generator=train_gen, epochs=100, verbose=1, callbacks=callback_list)
+history = model.fit_generator(generator=train_gen, epochs=100, verbose=1, callbacks=callback_list)
 
+'''
 train = train.reshape(train.shape + (1,)).astype(np.float32)
 train_label = train_label.reshape(train_label.shape + (1,))
-train_label = np.concatenate([train_label, 1 - train_label], axis=4)
+train_label = np.concatenate([train_label, 1.0 - train_label], axis=4)
 train_label = train_label.astype(np.float32)
 
 history = model.fit(train, train_label, epochs=100, batch_size=2, verbose=1, callbacks=callback_list)
+'''
+acc = []
+for i in range(5):
+    pred = model.predict(test[None, i, :, :, :].reshape(test[None, i, :, :, :].shape + (1, )))
+    #np.savetxt("pred{}".format(test_n[i]), pred, delimiter=',')
+    with open("test/pred{}.pkl".format(test_n[i]), "wb") as img_file:
+        pickle.dump(pred, img_file)
+    testl = test_label[i, :, :, :].reshape((128, 128, 64))
+    predl = pred[0,:, :, :, 0].reshape((128, 128, 64))
+
 
 model_json = model.to_json()
 with open("vnet.json", "w") as json_file:
@@ -708,7 +755,6 @@ with open("vnet.json", "w") as json_file:
 # serialize weights to HDF5
 model.save_weights("vnet.h5")
 print("Saved model to disk")
-
 
 numpy_loss_history = np.array(history.history["loss"])
 np.savetxt("loss_history.txt", numpy_loss_history, delimiter=",")
